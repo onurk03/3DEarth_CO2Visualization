@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>2020 World CO2</title>
+    <script src="//unpkg.com/d3"></script>
+    <script src="//unpkg.com/d3-dsv"></script>
+
+    <script src="//unpkg.com/globe.gl"></script>
+</head>
+<body>
+<div id="flexBox">
+    <h1 id="title">2020 CO2 Emissions by Country</h1>
+    <footer> source: European Commission JRC 2020 CO2 Emissions Report</footer>
+    <div id="globeViz">
+    </div>
+</div>
+    <script>
+        const weightColor = d3.scaleSequentialSqrt(d3.interpolateYlOrRd)
+            .domain([0, 4310]); // 4310 is the total emitted co2 in mega tons in 2019
+
+        const world = Globe()
+        (document.getElementById('globeViz'))
+            .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+            .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+            .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+            .hexBinPointWeight('co2')
+            .hexAltitude(d => d.sumWeight * 0.0001)
+            .hexBinResolution(4)
+            .hexTopColor(d => weightColor(d.sumWeight))
+            .hexSideColor(d => weightColor(d.sumWeight))
+            .hexBinMerge(true)
+            .enablePointerInteraction(false); // performance improvement
+
+        window.addEventListener('resize', (event) => {
+            world.width([event.target.innerWidth])
+            world.height([event.target.innerHeight])
+        });
+
+        // data is parsed and
+        fetch('/data.csv').then(res => res.text())
+            .then(csv => d3.csvParse(csv, ({ lat, lng, co2 }) => ({
+                lat: +lat,
+                lng: +lng,
+                co2: +co2
+            })))
+            .then(data => world.hexBinPointsData(data));
+
+        // Add auto-rotation
+        world.controls().autoRotate = true;
+        world.controls().autoRotateSpeed = 0.6;
+
+    </script>
+</body>
+</html>
