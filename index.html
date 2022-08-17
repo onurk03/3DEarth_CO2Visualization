@@ -38,7 +38,7 @@
         });
 
         // data is parsed and
-        fetch('/data.csv').then(res => res.text())
+        fetch('data.csv').then(res => res.text())
             .then(csv => d3.csvParse(csv, ({ lat, lng, co2 }) => ({
                 lat: +lat,
                 lng: +lng,
