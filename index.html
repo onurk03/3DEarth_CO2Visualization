@@ -37,7 +37,8 @@
             world.height([event.target.innerHeight])
         });
 
-        // data is parsed and
+        // data is parsed into latitude, longitude, and co2 sections and mapped onto
+        // the globe as 3D hex bin points
         fetch('data.csv').then(res => res.text())
             .then(csv => d3.csvParse(csv, ({ lat, lng, co2 }) => ({
                 lat: +lat,
